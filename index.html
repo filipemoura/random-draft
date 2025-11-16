@@ -21,6 +21,15 @@
         }
       }
     </script>
+    <script>
+      (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect != location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
   </head>
   <body class="bg-neutral-800 text-neutral-100">
     <div id="root"></div>
