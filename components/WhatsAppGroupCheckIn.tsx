@@ -1,56 +1,68 @@
-import React, { useState } from 'react';
-import { Player } from '../types';
+import React, { useState } from "react";
+import { Player } from "../types";
 
 interface WhatsAppGroupCheckInProps {
     players: Player[];
     onClose: () => void;
 }
 
-export const WhatsAppGroupCheckIn: React.FC<WhatsAppGroupCheckInProps> = ({ players, onClose }) => {
+export const WhatsAppGroupCheckIn: React.FC<WhatsAppGroupCheckInProps> = ({
+    players,
+    onClose,
+}) => {
     const [eventId] = useState(() => crypto.randomUUID());
     const [sent, setSent] = useState(false);
 
     const sendToGroup = () => {
-        // Salva evento no localStorage
-        localStorage.setItem(`event-${eventId}`, JSON.stringify({
-            players: players.map(p => ({ id: p.id, name: p.name, role: p.role })),
-            date: new Date().toISOString()
-        }));
+        localStorage.setItem(
+            `event-${eventId}`,
+            JSON.stringify({
+                players: players.map((p) => ({ id: p.id, name: p.name, role: p.role })),
+                date: new Date().toISOString(),
+            })
+        );
 
-        // UM LINK SÓ!
-        const confirmLink = `${window.location.origin}/?event=${eventId}`;
+        // Pega o base path da URL atual
+        const basePath = window.location.pathname.replace(/\/$/, "") || "";
+        const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
 
-        const groupMessage = `🏆 *FUTEBOL - CONFIRME SUA PRESENÇA!* 🏆
+        const groupMessage = `🏆 *PELADA - CONFIRME SUA PRESENÇA!* 🏆
 
-👇 *Clique aqui para confirmar:*
-${confirmLink}
+    👇 *Clique aqui para confirmar:*
+    ${confirmLink}
 
-⚽ Vai abrir uma página com seu nome
-⚡ É só clicar!`;
+    ⚽ Vai abrir uma página com seu nome
+    ⚡ É só clicar!`;
 
-        window.open(`https://wa.me/?text=${encodeURIComponent(groupMessage)}`, '_blank');
+        window.open(
+            `https://wa.me/?text=${encodeURIComponent(groupMessage)}`,
+            "_blank"
+        );
         setSent(true);
     };
 
     const copyMessage = () => {
-        // Salva evento no localStorage
-        localStorage.setItem(`event-${eventId}`, JSON.stringify({
-            players: players.map(p => ({ id: p.id, name: p.name, role: p.role })),
-            date: new Date().toISOString()
-        }));
+        localStorage.setItem(
+            `event-${eventId}`,
+            JSON.stringify({
+                players: players.map((p) => ({ id: p.id, name: p.name, role: p.role })),
+                date: new Date().toISOString(),
+            })
+        );
 
-        const confirmLink = `${window.location.origin}/?event=${eventId}`;
+        const basePath = window.location.pathname.replace(/\/$/, "") || "";
+        const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
 
-        const groupMessage = `🏆 FUTEBOL - CONFIRME SUA PRESENÇA! 🏆
+        const groupMessage = `🏆 PELADA - CONFIRME SUA PRESENÇA! 🏆
 
-👇 Clique aqui para confirmar:
-${confirmLink}
+    👇 Clique aqui para confirmar:
+    ${confirmLink}
 
-⚽ Vai abrir uma página com seu nome
-⚡ É só clicar!`;
+    ⚽ Vai abrir uma página com seu nome
+    ⚡ É só clicar!`;
 
         navigator.clipboard.writeText(groupMessage);
-        alert('✅ Mensagem copiada! Cole no grupo do WhatsApp.');
+        alert("✅ Mensagem copiada! Cole no grupo do WhatsApp.");
     };
 
     return (
@@ -81,12 +93,18 @@ ${confirmLink}
                 </div>
 
                 <div className="bg-neutral-600 p-4 rounded-lg mb-6">
-                    <p className="text-neutral-300 text-sm mb-2">📋 Preview da mensagem:</p>
+                    <p className="text-neutral-300 text-sm mb-2">
+                        📋 Preview da mensagem:
+                    </p>
                     <div className="bg-neutral-800 p-3 rounded text-xs text-neutral-300">
-                        <p className="font-bold mb-2">🏆 FUTEBOL - CONFIRME SUA PRESENÇA! 🏆</p>
+                        <p className="font-bold mb-2">
+                            🏆 FUTEBOL - CONFIRME SUA PRESENÇA! 🏆
+                        </p>
                         <p className="mb-1">👇 Clique aqui para confirmar:</p>
                         <p className="text-blue-400 mb-2">[link único]</p>
-                        <p className="text-neutral-400">⚽ Vai abrir uma página com seu nome</p>
+                        <p className="text-neutral-400">
+                            ⚽ Vai abrir uma página com seu nome
+                        </p>
                         <p className="text-neutral-400">⚡ É só clicar!</p>
                     </div>
                 </div>
@@ -98,7 +116,7 @@ ${confirmLink}
                     >
                         📱 Abrir WhatsApp e Enviar
                     </button>
-                    
+
                     <button
                         onClick={copyMessage}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"

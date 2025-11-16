@@ -1,9 +1,9 @@
-import React from 'react';
-import { Player } from '../types';
+import React from "react";
+import { Player } from "../types";
 
 export const SelectPlayerPage: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get('event');
+    const eventId = urlParams.get("event");
 
     if (!eventId) {
         return (
@@ -29,12 +29,13 @@ export const SelectPlayerPage: React.FC = () => {
     const { players } = JSON.parse(eventData);
 
     const handlePlayerClick = (player: Player) => {
-        // Redireciona para confirmação
-        window.location.href = `/?confirm=${eventId}&p=${player.id}`;
+        const basePath = window.location.pathname.replace(/\/$/, "") || "";
+        window.location.href = `${window.location.origin}${basePath}/?confirm=${eventId}&p=${player.id}`;
     };
 
     const handleNewPlayer = () => {
-        window.location.href = `/?new=${eventId}`;
+        const basePath = window.location.pathname.replace(/\/$/, "") || "";
+        window.location.href = `${window.location.origin}${basePath}/?new=${eventId}`;
     };
 
     return (
@@ -45,9 +46,7 @@ export const SelectPlayerPage: React.FC = () => {
                     <h1 className="text-3xl font-bold text-brand-primary mb-2">
                         Confirme sua Presença
                     </h1>
-                    <p className="text-neutral-400">
-                        Clique no seu nome para confirmar
-                    </p>
+                    <p className="text-neutral-400">Clique no seu nome para confirmar</p>
                 </div>
 
                 <div className="space-y-3 mb-8">
