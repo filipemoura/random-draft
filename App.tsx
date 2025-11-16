@@ -19,6 +19,7 @@ const App: React.FC = () => {
             id: crypto.randomUUID(),
             name,
             role,
+            present: true,
         };
         setPlayers(prev => [...prev, newPlayer]);
         setError(null);
@@ -28,23 +29,42 @@ const App: React.FC = () => {
         setPlayers(prev => prev.filter(p => p.id !== id));
     };
 
+    const handleTogglePresence = (id: string) => {
+        setPlayers(prev => 
+            prev.map(p => 
+                p.id === id ? { ...p, present: !p.present } : p
+            )
+        );
+    };
+
     const handleClearAll = () => {
+    if (window.confirm('Tem certeza que deseja remover todos os jogadores? Esta ação não pode ser desfeita.')) {
         setPlayers([]);
         setTeams(null);
         setError(null);
-    };
+    }
+};
 
     const handleSortTeams = () => {
         setError(null);
         setTeams(null);
 
+        const presentPlayers = players.filter(p => p.present);
+
+        if (presentPlayers.length === 0) {
+            setError('Marque pelo menos um jogador como presente para o sorteio.');
+            return;
+        }
+
         try {
-            const sortedTeams = sortTeams(players, numberOfTeams);
+            const sortedTeams = sortTeams(presentPlayers, numberOfTeams);
             setTeams(sortedTeams);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Erro ao sortear times');
         }
     };
+
+    const presentCount = players.filter(p => p.present).length;
 
     return (
         <div className="min-h-screen bg-neutral-800 font-sans p-4 sm:p-6 lg:p-8">
@@ -66,7 +86,11 @@ const App: React.FC = () => {
                                 Gerenciar Jogadores
                             </h2>
                             <PlayerForm onAddPlayer={handleAddPlayer} />
-                            <PlayerList players={players} onRemovePlayer={handleRemovePlayer} />
+                            <PlayerList 
+                                players={players} 
+                                onRemovePlayer={handleRemovePlayer}
+                                onTogglePresence={handleTogglePresence}
+                            />
                         </div>
 
                         <div className="mt-auto pt-6">
@@ -101,7 +125,7 @@ const App: React.FC = () => {
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <button
                                     onClick={handleSortTeams}
-                                    disabled={players.length < numberOfTeams}
+                                    disabled={presentCount < numberOfTeams}
                                     className="flex-1 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition disabled:bg-neutral-500 disabled:cursor-not-allowed"
                                 >
                                     <ShuffleIcon />
