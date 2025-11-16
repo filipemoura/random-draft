@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Player, Role } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useTeamSorter } from './hooks/useTeamSorter';
@@ -6,13 +6,57 @@ import { PlayerForm } from './components/PlayerForm';
 import { PlayerList } from './components/PlayerList';
 import { TeamsDisplay } from './components/TeamsDisplay';
 import { ShuffleIcon } from './components/Icons';
+import { WhatsAppGroupCheckIn } from './components/WhatsAppGroupCheckIn';
+import { ConfirmationPage } from './components/ConfirmationPage';
+import { NewPlayerPage } from './components/NewPlayerPage';
+import { SelectPlayerPage } from './components/SelectPlayerPage';
 
 const App: React.FC = () => {
+    const [showWhatsAppCheckIn, setShowWhatsAppCheckIn] = useState(false);
     const [players, setPlayers] = useLocalStorage<Player[]>('team-sorter-players', []);
     const [teams, setTeams] = useState<Player[][] | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [numberOfTeams, setNumberOfTeams] = useState<number>(2);
     const { sortTeams } = useTeamSorter();
+    const urlParams = new URLSearchParams(window.location.search);
+    const isConfirmation = urlParams.has('confirm');
+    const isNewPlayer = urlParams.has('new');
+    const isSelectPlayer = urlParams.has('event');
+
+    if (isConfirmation) {
+        return <ConfirmationPage />;
+    }
+
+    if (isNewPlayer) {
+        return <NewPlayerPage />;
+    }
+
+    if (isSelectPlayer) {
+    return <SelectPlayerPage />;
+}
+
+    useEffect(() => {
+        const channel = new BroadcastChannel('checkin-channel');
+        
+        channel.onmessage = (event) => {
+            if (event.data.type === 'checkin') {
+                const { playerId } = event.data;
+                handleTogglePresence(playerId);
+            } else if (event.data.type === 'new-player') {
+                // Adiciona novo jogador automaticamente
+                const { playerId, playerName, role } = event.data;
+                const newPlayer: Player = {
+                    id: playerId,
+                    name: playerName,
+                    role: role,
+                    present: true
+                };
+                setPlayers(prev => [...prev, newPlayer]);
+            }
+        };
+
+        return () => channel.close();
+    }, []);
 
     const handleAddPlayer = (name: string, role: Role) => {
         const newPlayer: Player = {
@@ -94,6 +138,13 @@ const App: React.FC = () => {
                         </div>
 
                         <div className="mt-auto pt-6">
+                            <button
+                                onClick={() => setShowWhatsAppCheckIn(true)}
+                                disabled={players.length === 0}
+                                className="w-full mb-4 bg-green-600 hover:bg-green-700 disabled:bg-neutral-500 disabled:cursor-not-allowed text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                            >
+                                📱 Enviar Confirmação para Grupo
+                            </button>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-neutral-300 mb-2">
                                     Número de Times
@@ -157,6 +208,12 @@ const App: React.FC = () => {
                     <p>@filipealves</p>
                 </footer>
             </div>
+            {showWhatsAppCheckIn && (
+                <WhatsAppGroupCheckIn
+                    players={players}
+                    onClose={() => setShowWhatsAppCheckIn(false)}
+                />
+            )}
         </div>
     );
 };
