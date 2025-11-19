@@ -59,7 +59,7 @@ ${confirmLink}
             const basePath = window.location.pathname.replace(/\/$/, '') || '';
             const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
 
-            const groupMessage = `🏆 FUTEBOL - CONFIRME SUA PRESENÇA! 🏆
+            const groupMessage = `🏆 PELADA - CONFIRME SUA PRESENÇA! 🏆
 
 👇 Clique aqui para confirmar:
 ${confirmLink}
@@ -67,11 +67,37 @@ ${confirmLink}
 ⚽ Vai abrir uma página com seu nome
 ⚡ É só clicar!`;
 
-            await navigator.clipboard.writeText(groupMessage);
-            alert('✅ Mensagem copiada! Cole no grupo do WhatsApp.');
-        } catch (error) {
-            console.error('Erro ao salvar no Firebase:', error);
-            alert('❌ Erro ao gerar link. Tente novamente.');
+            // Tenta copiar - se falhar, mostra o texto
+            try {
+                await navigator.clipboard.writeText(groupMessage);
+                alert('✅ Mensagem copiada! Cole no grupo do WhatsApp.');
+            } catch (clipboardError) {
+                // Fallback: mostra o texto em um alert para copiar manualmente
+                console.log('Clipboard bloqueado, usando fallback');
+
+                // Cria textarea temporário (funciona melhor em iOS)
+                const textarea = document.createElement('textarea');
+                textarea.value = groupMessage;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+
+                try {
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('✅ Mensagem copiada! Cole no grupo do WhatsApp.');
+                } catch (execError) {
+                    // Se nada funcionar, mostra o texto
+                    document.body.removeChild(textarea);
+                    alert(`📋 Copie esta mensagem:\n\n${groupMessage}`);
+                }
+            }
+
+            setSent(true);
+        } catch (error: any) {
+            console.error('Erro ao gerar link:', error);
+            alert(`❌ Erro ao gerar link: ${error.message}`);
         } finally {
             setLoading(false);
         }
