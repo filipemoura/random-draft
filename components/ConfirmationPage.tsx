@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircleIcon } from './Icons';
+import { ref, get, set } from 'firebase/database';
+import { database } from '../firebase';
 
 export const ConfirmationPage: React.FC = () => {
     const [playerName, setPlayerName] = useState<string>('');
@@ -9,58 +11,52 @@ export const ConfirmationPage: React.FC = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = urlParams.get('confirm');
         const playerId = urlParams.get('p');
-        const playersData = urlParams.get('data');
 
-        if (!eventId || !playerId || !playersData) {
+        if (!eventId || !playerId) {
             setStatus('error');
             return;
         }
 
-        // Decodifica dados da URL
-        let players;
-        try {
-            players = JSON.parse(atob(playersData));
-        } catch (e) {
-            setStatus('error');
-            return;
-        }
+        // Busca dados do evento no Firebase
+        const eventRef = ref(database, `events/${eventId}`);
+        get(eventRef)
+            .then((snapshot) => {
+                if (!snapshot.exists()) {
+                    setStatus('error');
+                    return;
+                }
 
-        const player = players.find((p: any) => p.id === playerId);
+                const { players } = snapshot.val();
+                const player = players.find((p: any) => p.id === playerId);
 
-        if (!player) {
-            setStatus('error');
-            return;
-        }
+                if (!player) {
+                    setStatus('error');
+                    return;
+                }
 
-        setPlayerName(player.name);
+                setPlayerName(player.name);
 
-        // Verifica se já confirmou (usando localStorage local do jogador)
-        const myConfirmations = JSON.parse(localStorage.getItem('my-confirmations') || '{}');
-        const confirmKey = `${eventId}-${playerId}`;
+                // Verifica se já confirmou
+                const confirmRef = ref(database, `events/${eventId}/confirmations/${playerId}`);
+                get(confirmRef).then((confirmSnapshot) => {
+                    if (confirmSnapshot.exists()) {
+                        setStatus('already');
+                        return;
+                    }
 
-        if (myConfirmations[confirmKey]) {
-            setStatus('already');
-            return;
-        }
-
-        // Marca confirmação local
-        myConfirmations[confirmKey] = {
-            name: player.name,
-            timestamp: new Date().toISOString()
-        };
-        localStorage.setItem('my-confirmations', JSON.stringify(myConfirmations));
-
-        // Notifica o organizador
-        const channel = new BroadcastChannel('checkin-channel');
-        channel.postMessage({
-            type: 'checkin',
-            playerId,
-            playerName: player.name,
-            eventId
-        });
-        channel.close();
-
-        setStatus('success');
+                    // Marca confirmação no Firebase
+                    set(confirmRef, {
+                        name: player.name,
+                        timestamp: new Date().toISOString()
+                    }).then(() => {
+                        setStatus('success');
+                    });
+                });
+            })
+            .catch((err) => {
+                console.error('Erro ao confirmar:', err);
+                setStatus('error');
+            });
     }, []);
 
     if (status === 'loading') {
@@ -121,7 +117,7 @@ export const ConfirmationPage: React.FC = () => {
                     Sua presença foi confirmada com sucesso.
                 </p>
                 <p className="text-neutral-400">
-                    Nos vemos na futebol! ⚽🔥
+                    Nos vemos no futebol! ⚽🔥
                 </p>
             </div>
         </div>

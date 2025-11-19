@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { Role } from '../types';
 import { RoleIcon } from './RoleIcon';
 import { CheckCircleIcon } from './Icons';
+import { ref, push } from 'firebase/database';
+import { database } from '../firebase';
 
 export const NewPlayerPage: React.FC = () => {
     const [name, setName] = useState('');
     const [role, setRole] = useState<Role>(Role.REGULAR);
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) return;
 
@@ -17,31 +20,34 @@ export const NewPlayerPage: React.FC = () => {
 
         if (!eventId) return;
 
+        setLoading(true);
+
         const newPlayerId = crypto.randomUUID();
 
-        // Salva confirmação local
-        const myConfirmations = JSON.parse(localStorage.getItem('my-confirmations') || '{}');
-        const confirmKey = `${eventId}-${newPlayerId}`;
-        myConfirmations[confirmKey] = {
-            name: name.trim(),
-            role: role,
-            timestamp: new Date().toISOString(),
-            isNew: true
-        };
-        localStorage.setItem('my-confirmations', JSON.stringify(myConfirmations));
+        try {
+            // Salva novo jogador no Firebase
+            const newPlayerRef = ref(database, `events/${eventId}/newPlayers/${newPlayerId}`);
+            await push(newPlayerRef, {
+                name: name.trim(),
+                role: role,
+                timestamp: new Date().toISOString()
+            });
 
-        // Notifica o organizador
-        const channel = new BroadcastChannel('checkin-channel');
-        channel.postMessage({
-            type: 'new-player',
-            playerId: newPlayerId,
-            playerName: name.trim(),
-            role: role,
-            eventId
-        });
-        channel.close();
+            // Marca confirmação
+            const confirmRef = ref(database, `events/${eventId}/confirmations/${newPlayerId}`);
+            await push(confirmRef, {
+                name: name.trim(),
+                timestamp: new Date().toISOString(),
+                isNew: true
+            });
 
-        setSubmitted(true);
+            setSubmitted(true);
+        } catch (error) {
+            console.error('Erro ao salvar:', error);
+            alert('❌ Erro ao confirmar. Tente novamente.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -59,7 +65,7 @@ export const NewPlayerPage: React.FC = () => {
                         Você foi adicionado(a) à lista de jogadores.
                     </p>
                     <p className="text-neutral-400">
-                        Nos vemos na futebol! ⚽🔥
+                        Nos vemos no futebol! ⚽🔥
                     </p>
                 </div>
             </div>
@@ -72,7 +78,7 @@ export const NewPlayerPage: React.FC = () => {
                 <div className="text-center mb-6">
                     <div className="text-5xl mb-3">🆕</div>
                     <h1 className="text-2xl font-bold text-brand-primary mb-2">
-                        Primeira vez na futebol?
+                        Primeira vez no futebol?
                     </h1>
                     <p className="text-neutral-400">
                         Preencha seus dados para confirmar presença
@@ -91,7 +97,8 @@ export const NewPlayerPage: React.FC = () => {
                             placeholder="Digite seu nome..."
                             autoFocus
                             required
-                            className="w-full bg-neutral-800 border border-neutral-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-brand-primary focus:outline-none transition"
+                            disabled={loading}
+                            className="w-full bg-neutral-800 border border-neutral-600 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-brand-primary focus:outline-none transition disabled:opacity-50"
                         />
                     </div>
 
@@ -106,7 +113,7 @@ export const NewPlayerPage: React.FC = () => {
                                     className={`flex items-center space-x-2 p-3 rounded-lg cursor-pointer transition ${role === roleOption
                                             ? 'bg-brand-primary text-white'
                                             : 'bg-neutral-600 hover:bg-neutral-500'
-                                        }`}
+                                        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <input
                                         type="radio"
@@ -114,6 +121,7 @@ export const NewPlayerPage: React.FC = () => {
                                         value={roleOption}
                                         checked={role === roleOption}
                                         onChange={() => setRole(roleOption)}
+                                        disabled={loading}
                                         className="hidden"
                                     />
                                     <RoleIcon role={roleOption} />
@@ -125,9 +133,10 @@ export const NewPlayerPage: React.FC = () => {
 
                     <button
                         type="submit"
-                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition"
+                        disabled={loading}
+                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-neutral-500 text-white font-bold py-3 px-4 rounded-lg transition"
                     >
-                        ✅ Confirmar Presença
+                        {loading ? '⏳ Confirmando...' : '✅ Confirmar Presença'}
                     </button>
                 </form>
 

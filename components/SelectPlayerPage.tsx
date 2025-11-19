@@ -1,44 +1,74 @@
-import React from "react";
-import { Player } from "../types";
+import React, { useEffect, useState } from 'react';
+import { Player } from '../types';
+import { ref, get } from 'firebase/database';
+import { database } from '../firebase';
 
 export const SelectPlayerPage: React.FC = () => {
+    const [players, setPlayers] = useState<Player[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
     const urlParams = new URLSearchParams(window.location.search);
     const eventId = urlParams.get('event');
-    const playersData = urlParams.get('data');
 
-    if (!eventId || !playersData) {
-        return (
-            <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
-                <div className="bg-neutral-700 p-8 rounded-xl text-center">
-                    <p className="text-red-400">Link inválido</p>
-                </div>
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (!eventId) {
+            setError(true);
+            setLoading(false);
+            return;
+        }
 
-    // Decodifica dados da URL
-    let players;
-    try {
-        players = JSON.parse(atob(playersData));
-    } catch (e) {
-        return (
-            <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
-                <div className="bg-neutral-700 p-8 rounded-xl text-center">
-                    <p className="text-red-400">Dados inválidos</p>
-                </div>
-            </div>
-        );
-    }
+        const eventRef = ref(database, `events/${eventId}`);
+        get(eventRef)
+            .then((snapshot) => {
+                if (snapshot.exists()) {
+                    setPlayers(snapshot.val().players || []);
+                } else {
+                    setError(true);
+                }
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error('Erro ao carregar evento:', err);
+                setError(true);
+                setLoading(false);
+            });
+    }, [eventId]);
 
     const handlePlayerClick = (player: Player) => {
         const basePath = window.location.pathname.replace(/\/$/, '') || '';
-        window.location.href = `${window.location.origin}${basePath}/?confirm=${eventId}&p=${player.id}&data=${playersData}`;
+        window.location.href = `${window.location.origin}${basePath}/?confirm=${eventId}&p=${player.id}`;
     };
 
     const handleNewPlayer = () => {
         const basePath = window.location.pathname.replace(/\/$/, '') || '';
-        window.location.href = `${window.location.origin}${basePath}/?new=${eventId}&data=${playersData}`;
+        window.location.href = `${window.location.origin}${basePath}/?new=${eventId}`;
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-neutral-800 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-primary mx-auto mb-4"></div>
+                    <p className="text-white text-xl">Carregando...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !players || players.length === 0) {
+        return (
+            <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
+                <div className="bg-neutral-700 p-8 rounded-xl text-center max-w-md">
+                    <div className="text-red-400 text-6xl mb-4">❌</div>
+                    <h1 className="text-2xl font-bold text-white mb-2">Link Inválido</h1>
+                    <p className="text-neutral-300">
+                        Este evento não foi encontrado ou expirou.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-neutral-800 p-4">
@@ -67,7 +97,7 @@ export const SelectPlayerPage: React.FC = () => {
 
                 <div className="border-t border-neutral-600 pt-6">
                     <p className="text-neutral-400 text-center mb-3 text-sm">
-                        Primeira vez na pelada?
+                        Primeira vez no futebol?
                     </p>
                     <button
                         onClick={handleNewPlayer}
