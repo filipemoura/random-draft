@@ -17,17 +17,11 @@ export const WhatsAppGroupCheckIn: React.FC<WhatsAppGroupCheckInProps> = ({ play
         setLoading(true);
 
         try {
-            // Salva no Firebase
-            const eventRef = ref(database, `events/${eventId}`);
-            await set(eventRef, {
-                players: players.map(p => ({ id: p.id, name: p.name, role: p.role })),
-                createdAt: new Date().toISOString()
-            });
-
+            // Gera o link PRIMEIRO
             const basePath = window.location.pathname.replace(/\/$/, '') || '';
             const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
 
-            const groupMessage = `🏆 *FUTEBOL - CONFIRME SUA PRESENÇA!* 🏆
+            const groupMessage = `🏆 *PELADA - CONFIRME SUA PRESENÇA!* 🏆
 
 👇 *Clique aqui para confirmar:*
 ${confirmLink}
@@ -35,11 +29,21 @@ ${confirmLink}
 ⚽ Vai abrir uma página com seu nome
 ⚡ É só clicar!`;
 
-            window.open(`https://wa.me/?text=${encodeURIComponent(groupMessage)}`, '_blank');
+            // ABRE WhatsApp ANTES de salvar (iOS precisa disso!)
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(groupMessage)}`;
+            window.open(whatsappUrl, '_blank');
+
+            // Agora salva no Firebase (em segundo plano)
+            const eventRef = ref(database, `events/${eventId}`);
+            await set(eventRef, {
+                players: players.map(p => ({ id: p.id, name: p.name, role: p.role })),
+                createdAt: new Date().toISOString()
+            });
+
             setSent(true);
-        } catch (error) {
-            console.error('Erro ao salvar no Firebase:', error);
-            alert('❌ Erro ao gerar link. Tente novamente.');
+        } catch (error: any) {
+            console.error('Erro ao gerar link:', error);
+            alert(`❌ Erro: ${error.message}`);
         } finally {
             setLoading(false);
         }
