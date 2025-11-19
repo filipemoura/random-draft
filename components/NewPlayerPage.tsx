@@ -19,24 +19,25 @@ export const NewPlayerPage: React.FC = () => {
 
         const newPlayerId = crypto.randomUUID();
 
-        // Adiciona confirmação do novo jogador
-        const confirmations = JSON.parse(localStorage.getItem(`event-${eventId}-confirmations`) || '{}');
-        confirmations[newPlayerId] = {
+        // Salva confirmação local
+        const myConfirmations = JSON.parse(localStorage.getItem('my-confirmations') || '{}');
+        const confirmKey = `${eventId}-${newPlayerId}`;
+        myConfirmations[confirmKey] = {
             name: name.trim(),
             role: role,
             timestamp: new Date().toISOString(),
             isNew: true
         };
-        localStorage.setItem(`event-${eventId}-confirmations`, JSON.stringify(confirmations));
+        localStorage.setItem('my-confirmations', JSON.stringify(myConfirmations));
 
         // Notifica o organizador
         const channel = new BroadcastChannel('checkin-channel');
-        channel.postMessage({ 
-            type: 'new-player', 
+        channel.postMessage({
+            type: 'new-player',
             playerId: newPlayerId,
             playerName: name.trim(),
             role: role,
-            eventId 
+            eventId
         });
         channel.close();
 
@@ -100,13 +101,12 @@ export const NewPlayerPage: React.FC = () => {
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                             {(Object.values(Role) as Array<Role>).map(roleOption => (
-                                <label 
+                                <label
                                     key={roleOption}
-                                    className={`flex items-center space-x-2 p-3 rounded-lg cursor-pointer transition ${
-                                        role === roleOption 
-                                            ? 'bg-brand-primary text-white' 
+                                    className={`flex items-center space-x-2 p-3 rounded-lg cursor-pointer transition ${role === roleOption
+                                            ? 'bg-brand-primary text-white'
                                             : 'bg-neutral-600 hover:bg-neutral-500'
-                                    }`}
+                                        }`}
                                 >
                                     <input
                                         type="radio"
@@ -123,7 +123,7 @@ export const NewPlayerPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <button 
+                    <button
                         type="submit"
                         className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition"
                     >

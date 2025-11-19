@@ -9,20 +9,22 @@ export const ConfirmationPage: React.FC = () => {
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = urlParams.get('confirm');
         const playerId = urlParams.get('p');
+        const playersData = urlParams.get('data');
 
-        if (!eventId || !playerId) {
+        if (!eventId || !playerId || !playersData) {
             setStatus('error');
             return;
         }
 
-        // Busca dados do evento
-        const eventData = localStorage.getItem(`event-${eventId}`);
-        if (!eventData) {
+        // Decodifica dados da URL
+        let players;
+        try {
+            players = JSON.parse(atob(playersData));
+        } catch (e) {
             setStatus('error');
             return;
         }
 
-        const { players } = JSON.parse(eventData);
         const player = players.find((p: any) => p.id === playerId);
 
         if (!player) {
@@ -32,27 +34,29 @@ export const ConfirmationPage: React.FC = () => {
 
         setPlayerName(player.name);
 
-        // Verifica se já confirmou
-        const confirmations = JSON.parse(localStorage.getItem(`event-${eventId}-confirmations`) || '{}');
-        if (confirmations[playerId]) {
+        // Verifica se já confirmou (usando localStorage local do jogador)
+        const myConfirmations = JSON.parse(localStorage.getItem('my-confirmations') || '{}');
+        const confirmKey = `${eventId}-${playerId}`;
+
+        if (myConfirmations[confirmKey]) {
             setStatus('already');
             return;
         }
 
-        // Marca confirmação
-        confirmations[playerId] = {
+        // Marca confirmação local
+        myConfirmations[confirmKey] = {
             name: player.name,
             timestamp: new Date().toISOString()
         };
-        localStorage.setItem(`event-${eventId}-confirmations`, JSON.stringify(confirmations));
+        localStorage.setItem('my-confirmations', JSON.stringify(myConfirmations));
 
-        // Notifica outras abas
+        // Notifica o organizador
         const channel = new BroadcastChannel('checkin-channel');
-        channel.postMessage({ 
-            type: 'checkin', 
-            playerId, 
+        channel.postMessage({
+            type: 'checkin',
+            playerId,
             playerName: player.name,
-            eventId 
+            eventId
         });
         channel.close();
 

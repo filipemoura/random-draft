@@ -3,9 +3,10 @@ import { Player } from "../types";
 
 export const SelectPlayerPage: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get("event");
+    const eventId = urlParams.get('event');
+    const playersData = urlParams.get('data');
 
-    if (!eventId) {
+    if (!eventId || !playersData) {
         return (
             <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
                 <div className="bg-neutral-700 p-8 rounded-xl text-center">
@@ -15,27 +16,28 @@ export const SelectPlayerPage: React.FC = () => {
         );
     }
 
-    const eventData = localStorage.getItem(`event-${eventId}`);
-    if (!eventData) {
+    // Decodifica dados da URL
+    let players;
+    try {
+        players = JSON.parse(atob(playersData));
+    } catch (e) {
         return (
             <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
                 <div className="bg-neutral-700 p-8 rounded-xl text-center">
-                    <p className="text-red-400">Evento não encontrado</p>
+                    <p className="text-red-400">Dados inválidos</p>
                 </div>
             </div>
         );
     }
 
-    const { players } = JSON.parse(eventData);
-
     const handlePlayerClick = (player: Player) => {
-        const basePath = window.location.pathname.replace(/\/$/, "") || "";
-        window.location.href = `${window.location.origin}${basePath}/?confirm=${eventId}&p=${player.id}`;
+        const basePath = window.location.pathname.replace(/\/$/, '') || '';
+        window.location.href = `${window.location.origin}${basePath}/?confirm=${eventId}&p=${player.id}&data=${playersData}`;
     };
 
     const handleNewPlayer = () => {
-        const basePath = window.location.pathname.replace(/\/$/, "") || "";
-        window.location.href = `${window.location.origin}${basePath}/?new=${eventId}`;
+        const basePath = window.location.pathname.replace(/\/$/, '') || '';
+        window.location.href = `${window.location.origin}${basePath}/?new=${eventId}&data=${playersData}`;
     };
 
     return (
@@ -46,7 +48,9 @@ export const SelectPlayerPage: React.FC = () => {
                     <h1 className="text-3xl font-bold text-brand-primary mb-2">
                         Confirme sua Presença
                     </h1>
-                    <p className="text-neutral-400">Clique no seu nome para confirmar</p>
+                    <p className="text-neutral-400">
+                        Clique no seu nome para confirmar
+                    </p>
                 </div>
 
                 <div className="space-y-3 mb-8">
@@ -63,7 +67,7 @@ export const SelectPlayerPage: React.FC = () => {
 
                 <div className="border-t border-neutral-600 pt-6">
                     <p className="text-neutral-400 text-center mb-3 text-sm">
-                        Primeira vez na futebol?
+                        Primeira vez na pelada?
                     </p>
                     <button
                         onClick={handleNewPlayer}

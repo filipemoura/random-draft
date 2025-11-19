@@ -14,55 +14,43 @@ export const WhatsAppGroupCheckIn: React.FC<WhatsAppGroupCheckInProps> = ({
     const [sent, setSent] = useState(false);
 
     const sendToGroup = () => {
-        localStorage.setItem(
-            `event-${eventId}`,
-            JSON.stringify({
-                players: players.map((p) => ({ id: p.id, name: p.name, role: p.role })),
-                date: new Date().toISOString(),
-            })
-        );
+        const playersData = btoa(JSON.stringify(
+            players.map(p => ({ id: p.id, name: p.name, role: p.role }))
+        ));
 
-        // Pega o base path da URL atual
-        const basePath = window.location.pathname.replace(/\/$/, "") || "";
-        const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
+        const basePath = window.location.pathname.replace(/\/$/, '') || '';
+        const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}&data=${playersData}`;
 
         const groupMessage = `🏆 *PELADA - CONFIRME SUA PRESENÇA!* 🏆
 
-    👇 *Clique aqui para confirmar:*
-    ${confirmLink}
+👇 *Clique aqui para confirmar:*
+${confirmLink}
 
-    ⚽ Vai abrir uma página com seu nome
-    ⚡ É só clicar!`;
+⚽ Vai abrir uma página com seu nome
+⚡ É só clicar!`;
 
-        window.open(
-            `https://wa.me/?text=${encodeURIComponent(groupMessage)}`,
-            "_blank"
-        );
+        window.open(`https://wa.me/?text=${encodeURIComponent(groupMessage)}`, '_blank');
         setSent(true);
     };
 
     const copyMessage = () => {
-        localStorage.setItem(
-            `event-${eventId}`,
-            JSON.stringify({
-                players: players.map((p) => ({ id: p.id, name: p.name, role: p.role })),
-                date: new Date().toISOString(),
-            })
-        );
+        const playersData = btoa(JSON.stringify(
+            players.map(p => ({ id: p.id, name: p.name, role: p.role }))
+        ));
 
-        const basePath = window.location.pathname.replace(/\/$/, "") || "";
-        const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
+        const basePath = window.location.pathname.replace(/\/$/, '') || '';
+        const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}&data=${playersData}`;
 
         const groupMessage = `🏆 PELADA - CONFIRME SUA PRESENÇA! 🏆
 
-    👇 Clique aqui para confirmar:
-    ${confirmLink}
+👇 Clique aqui para confirmar:
+${confirmLink}
 
-    ⚽ Vai abrir uma página com seu nome
-    ⚡ É só clicar!`;
+⚽ Vai abrir uma página com seu nome
+⚡ É só clicar!`;
 
         navigator.clipboard.writeText(groupMessage);
-        alert("✅ Mensagem copiada! Cole no grupo do WhatsApp.");
+        alert('✅ Mensagem copiada! Cole no grupo do WhatsApp.');
     };
 
     return (
