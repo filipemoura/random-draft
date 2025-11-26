@@ -65,7 +65,7 @@ export const NewPlayerPage: React.FC = () => {
                         Você foi adicionado(a) à lista de jogadores.
                     </p>
                     <p className="text-neutral-400">
-                        Nos vemos na pelada! ⚽🔥
+                        Nos vemos na futebol! ⚽🔥
                     </p>
                 </div>
             </div>
@@ -78,7 +78,7 @@ export const NewPlayerPage: React.FC = () => {
                 <div className="text-center mb-6">
                     <div className="text-5xl mb-3">🆕</div>
                     <h1 className="text-2xl font-bold text-brand-primary mb-2">
-                        Primeira vez na pelada?
+                        Primeira vez na futebol?
                     </h1>
                     <p className="text-neutral-400">
                         Preencha seus dados para confirmar presença

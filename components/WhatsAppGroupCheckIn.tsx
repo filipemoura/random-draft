@@ -27,7 +27,7 @@ export const WhatsAppGroupCheckIn: React.FC<WhatsAppGroupCheckInProps> = ({ play
             const basePath = window.location.pathname.replace(/\/$/, '') || '';
             const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
 
-            const groupMessage = `🏆 *PELADA - CONFIRME SUA PRESENÇA!* 🏆
+            const groupMessage = `🏆 *FUTEBOL - CONFIRME SUA PRESENÇA!* 🏆
 
 👇 *Clique aqui para confirmar:*
 ${confirmLink}
@@ -87,7 +87,7 @@ ${confirmLink}
             const basePath = window.location.pathname.replace(/\/$/, '') || '';
             const confirmLink = `${window.location.origin}${basePath}/?event=${eventId}`;
 
-            const groupMessage = `🏆 PELADA - CONFIRME SUA PRESENÇA! 🏆
+            const groupMessage = `🏆 FUTEBOL - CONFIRME SUA PRESENÇA! 🏆
 
 👇 Clique aqui para confirmar:
 ${confirmLink}
