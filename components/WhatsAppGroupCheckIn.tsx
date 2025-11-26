@@ -125,7 +125,7 @@ ${confirmLink}
             setSent(true);
         } catch (error: any) {
             console.error('Erro ao gerar link:', error);
-            alert(`❌ Erro ao gerar link: ${error.message}`);
+            alert(`Erro ao gerar link: ${error.message}`);
         } finally {
             setLoading(false);
         }

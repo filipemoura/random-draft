@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Player } from '../types';
 import { ref, get } from 'firebase/database';
 import { database } from '../firebase';
+import { Loader2, XCircle, Users, UserPlus } from 'lucide-react';
 
 export const SelectPlayerPage: React.FC = () => {
     const [players, setPlayers] = useState<Player[]>([]);
@@ -49,7 +50,7 @@ export const SelectPlayerPage: React.FC = () => {
         return (
             <div className="min-h-screen bg-neutral-800 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-primary mx-auto mb-4"></div>
+                    <Loader2 className="w-16 h-16 text-brand-primary mx-auto mb-4 animate-spin" />
                     <p className="text-white text-xl">Carregando...</p>
                 </div>
             </div>
@@ -60,7 +61,7 @@ export const SelectPlayerPage: React.FC = () => {
         return (
             <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
                 <div className="bg-neutral-700 p-8 rounded-xl text-center max-w-md">
-                    <div className="text-red-400 text-6xl mb-4">❌</div>
+                    <XCircle className="w-24 h-24 text-red-400 mx-auto mb-4" />
                     <h1 className="text-2xl font-bold text-white mb-2">Link Inválido</h1>
                     <p className="text-neutral-300">
                         Este evento não foi encontrado ou expirou.
@@ -74,7 +75,7 @@ export const SelectPlayerPage: React.FC = () => {
         <div className="min-h-screen bg-neutral-800 p-4">
             <div className="max-w-2xl mx-auto">
                 <div className="text-center mb-8 pt-8">
-                    <div className="text-6xl mb-4">⚽</div>
+                    <Users className="w-20 h-20 text-brand-primary mx-auto mb-4" />
                     <h1 className="text-3xl font-bold text-brand-primary mb-2">
                         Confirme sua Presença
                     </h1>
@@ -101,9 +102,10 @@ export const SelectPlayerPage: React.FC = () => {
                     </p>
                     <button
                         onClick={handleNewPlayer}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-6 rounded-xl transition-all transform hover:scale-[1.02] text-xl shadow-lg"
+                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-5 px-6 rounded-xl transition-all transform hover:scale-[1.02] text-xl shadow-lg flex items-center justify-center gap-2"
                     >
-                        🆕 Sou Novo Aqui
+                        <UserPlus className="w-6 h-6" />
+                        Sou Novo Aqui
                     </button>
                 </div>
             </div>

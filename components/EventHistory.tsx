@@ -1,4 +1,5 @@
 import React from 'react';
+import { ClipboardList, CheckCircle, Circle } from 'lucide-react';
 
 interface EventHistoryItem {
     id: string;
@@ -16,7 +17,10 @@ export const EventHistory: React.FC<EventHistoryProps> = ({ events, activeEventI
 
     return (
         <div className="mb-4 bg-neutral-600 p-3 rounded-lg">
-            <p className="text-sm text-neutral-300 mb-2 font-semibold">📋 Eventos:</p>
+            <p className="text-sm text-neutral-300 mb-2 font-semibold flex items-center gap-2">
+                <ClipboardList className="w-4 h-4" />
+                Eventos:
+            </p>
             <div className="space-y-2">
                 {events.map((event) => {
                     const isActive = event.id === activeEventId;
@@ -30,7 +34,12 @@ export const EventHistory: React.FC<EventHistoryProps> = ({ events, activeEventI
                                 }`}
                         >
                             <span className="flex items-center gap-2">
-                                {isActive ? '✅' : '⚪'} {event.id.slice(0, 8)}...
+                                {isActive ? (
+                                    <CheckCircle className="w-4 h-4 text-green-300" />
+                                ) : (
+                                    <Circle className="w-4 h-4 text-neutral-400" />
+                                )}
+                                {event.id.slice(0, 8)}...
                             </span>
                             <span className="text-xs text-neutral-300">{event.date}</span>
                         </button>

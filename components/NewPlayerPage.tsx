@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Role } from '../types';
 import { RoleIcon } from './RoleIcon';
-import { CheckCircleIcon } from './Icons';
+import { CheckCircle, UserPlus, Loader2, Info } from 'lucide-react';
 import { ref, set } from 'firebase/database';
 import { database } from '../firebase';
 
@@ -44,7 +44,7 @@ export const NewPlayerPage: React.FC = () => {
             setSubmitted(true);
         } catch (error) {
             console.error('Erro ao salvar:', error);
-            alert('❌ Erro ao confirmar. Tente novamente.');
+            alert('Erro ao confirmar. Tente novamente.');
         } finally {
             setLoading(false);
         }
@@ -54,7 +54,7 @@ export const NewPlayerPage: React.FC = () => {
         return (
             <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
                 <div className="bg-neutral-700 p-8 rounded-xl text-center max-w-md">
-                    <CheckCircleIcon className="w-24 h-24 text-green-400 mx-auto mb-6" />
+                    <CheckCircle className="w-24 h-24 text-green-400 mx-auto mb-6" />
                     <h1 className="text-3xl font-bold text-white mb-2">
                         Bem-vindo(a)!
                     </h1>
@@ -65,7 +65,7 @@ export const NewPlayerPage: React.FC = () => {
                         Você foi adicionado(a) à lista de jogadores.
                     </p>
                     <p className="text-neutral-400">
-                        Nos vemos na futebol! ⚽🔥
+                        Nos vemos no futebol! ⚽
                     </p>
                 </div>
             </div>
@@ -76,9 +76,9 @@ export const NewPlayerPage: React.FC = () => {
         <div className="min-h-screen bg-neutral-800 flex items-center justify-center p-4">
             <div className="bg-neutral-700 p-6 rounded-xl max-w-md w-full">
                 <div className="text-center mb-6">
-                    <div className="text-5xl mb-3">🆕</div>
+                    <UserPlus className="w-16 h-16 text-brand-primary mx-auto mb-3" />
                     <h1 className="text-2xl font-bold text-brand-primary mb-2">
-                        Primeira vez na futebol?
+                        Primeira vez no futebol?
                     </h1>
                     <p className="text-neutral-400">
                         Preencha seus dados para confirmar presença
@@ -108,13 +108,12 @@ export const NewPlayerPage: React.FC = () => {
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                             {(Object.values(Role) as Array<Role>).map(roleOption => (
-                                <label 
+                                <label
                                     key={roleOption}
-                                    className={`flex items-center space-x-2 p-3 rounded-lg cursor-pointer transition ${
-                                        role === roleOption 
-                                            ? 'bg-brand-primary text-white' 
+                                    className={`flex items-center space-x-2 p-3 rounded-lg cursor-pointer transition ${role === roleOption
+                                            ? 'bg-brand-primary text-white'
                                             : 'bg-neutral-600 hover:bg-neutral-500'
-                                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <input
                                         type="radio"
@@ -132,17 +131,28 @@ export const NewPlayerPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <button 
+                    <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-neutral-500 text-white font-bold py-3 px-4 rounded-lg transition"
+                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-neutral-500 text-white font-bold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
                     >
-                        {loading ? '⏳ Confirmando...' : '✅ Confirmar Presença'}
+                        {loading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Confirmando...
+                            </>
+                        ) : (
+                            <>
+                                <CheckCircle className="w-5 h-5" />
+                                Confirmar Presença
+                            </>
+                        )}
                     </button>
                 </form>
 
                 <div className="mt-6 bg-blue-600 bg-opacity-20 border border-blue-400 p-3 rounded-lg">
-                    <p className="text-blue-300 text-xs text-center">
+                    <p className="text-blue-300 text-xs text-center flex items-center justify-center gap-2">
+                        <Info className="w-4 h-4 flex-shrink-0" />
                         Ao confirmar, você será adicionado à lista de jogadores
                     </p>
                 </div>
