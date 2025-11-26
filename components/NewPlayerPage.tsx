@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Role } from '../types';
 import { RoleIcon } from './RoleIcon';
 import { CheckCircleIcon } from './Icons';
-import { ref, push } from 'firebase/database';
+import { ref, set } from 'firebase/database';
 import { database } from '../firebase';
 
 export const NewPlayerPage: React.FC = () => {
@@ -25,9 +25,9 @@ export const NewPlayerPage: React.FC = () => {
         const newPlayerId = crypto.randomUUID();
 
         try {
-            // Salva novo jogador no Firebase
+            // Salva novo jogador (estrutura simples)
             const newPlayerRef = ref(database, `events/${eventId}/newPlayers/${newPlayerId}`);
-            await push(newPlayerRef, {
+            await set(newPlayerRef, {
                 name: name.trim(),
                 role: role,
                 timestamp: new Date().toISOString()
@@ -35,7 +35,7 @@ export const NewPlayerPage: React.FC = () => {
 
             // Marca confirmação
             const confirmRef = ref(database, `events/${eventId}/confirmations/${newPlayerId}`);
-            await push(confirmRef, {
+            await set(confirmRef, {
                 name: name.trim(),
                 timestamp: new Date().toISOString(),
                 isNew: true
@@ -65,7 +65,7 @@ export const NewPlayerPage: React.FC = () => {
                         Você foi adicionado(a) à lista de jogadores.
                     </p>
                     <p className="text-neutral-400">
-                        Nos vemos no futebol! ⚽🔥
+                        Nos vemos na pelada! ⚽🔥
                     </p>
                 </div>
             </div>
@@ -78,7 +78,7 @@ export const NewPlayerPage: React.FC = () => {
                 <div className="text-center mb-6">
                     <div className="text-5xl mb-3">🆕</div>
                     <h1 className="text-2xl font-bold text-brand-primary mb-2">
-                        Primeira vez no futebol?
+                        Primeira vez na pelada?
                     </h1>
                     <p className="text-neutral-400">
                         Preencha seus dados para confirmar presença
@@ -108,12 +108,13 @@ export const NewPlayerPage: React.FC = () => {
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                             {(Object.values(Role) as Array<Role>).map(roleOption => (
-                                <label
+                                <label 
                                     key={roleOption}
-                                    className={`flex items-center space-x-2 p-3 rounded-lg cursor-pointer transition ${role === roleOption
-                                            ? 'bg-brand-primary text-white'
+                                    className={`flex items-center space-x-2 p-3 rounded-lg cursor-pointer transition ${
+                                        role === roleOption 
+                                            ? 'bg-brand-primary text-white' 
                                             : 'bg-neutral-600 hover:bg-neutral-500'
-                                        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <input
                                         type="radio"
@@ -131,7 +132,7 @@ export const NewPlayerPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <button
+                    <button 
                         type="submit"
                         disabled={loading}
                         className="w-full bg-green-600 hover:bg-green-700 disabled:bg-neutral-500 text-white font-bold py-3 px-4 rounded-lg transition"

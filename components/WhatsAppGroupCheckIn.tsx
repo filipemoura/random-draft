@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Player } from '../types';
 import { ref, set } from 'firebase/database';
 import { database } from '../firebase';
@@ -12,6 +12,12 @@ export const WhatsAppGroupCheckIn: React.FC<WhatsAppGroupCheckInProps> = ({ play
     const [eventId] = useState(() => crypto.randomUUID());
     const [sent, setSent] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (sent) {
+            localStorage.setItem('active-event-id', eventId);
+        }
+    }, [sent, eventId]);
 
     const sendToGroup = async () => {
         setLoading(true);
@@ -39,6 +45,24 @@ ${confirmLink}
                 players: players.map(p => ({ id: p.id, name: p.name, role: p.role })),
                 createdAt: new Date().toISOString()
             });
+
+            const history = JSON.parse(localStorage.getItem('event-history') || '[]');
+            const newEvent = {
+                id: eventId,
+                date: new Date().toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            // Adiciona no início e mantém só 5 últimos
+            const updatedHistory = [newEvent, ...history.filter((e: any) => e.id !== eventId)].slice(0, 5);
+            localStorage.setItem('event-history', JSON.stringify(updatedHistory));
+
+            // Ativa automaticamente
+            localStorage.setItem('active-event-id', eventId);
 
             setSent(true);
         } catch (error: any) {

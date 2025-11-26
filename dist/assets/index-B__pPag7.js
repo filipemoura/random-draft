@@ -1674,13 +1674,13 @@ FIREBASE: `))}restoreState_(){this.tryAuth(),this.tryAppCheck();for(const e of t
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */Jn(qC,XC,"app");const JC={apiKey:"AIzaSyAQYCkgAfWJT86qpbjNvUotOpZLIDvMS2g",authDomain:"random-draft-457cb.firebaseapp.com",databaseURL:"https://random-draft-457cb-default-rtdb.europe-west1.firebasedatabase.app",projectId:"random-draft-457cb",storageBucket:"random-draft-457cb.firebasestorage.app",messagingSenderId:"441147357738",appId:"1:441147357738:web:1b79de105155875813a153",measurementId:"G-8Z51HVX18T"},ZC=bp(JC),kn=QC(ZC),eE=({players:t,onClose:e})=>{const[n]=U.useState(()=>crypto.randomUUID()),[r,i]=U.useState(!1),[s,o]=U.useState(!1),l=async()=>{o(!0);try{const u=xn(kn,`events/${n}`);await lo(u,{players:t.map(_=>({id:_.id,name:_.name,role:_.role})),createdAt:new Date().toISOString()});const f=window.location.pathname.replace(/\/$/,"")||"",c=`🏆 *FUTEBOL - CONFIRME SUA PRESENÇA!* 🏆
+ */Jn(qC,XC,"app");const JC={apiKey:"AIzaSyAQYCkgAfWJT86qpbjNvUotOpZLIDvMS2g",authDomain:"random-draft-457cb.firebaseapp.com",databaseURL:"https://random-draft-457cb-default-rtdb.europe-west1.firebasedatabase.app",projectId:"random-draft-457cb",storageBucket:"random-draft-457cb.firebasestorage.app",messagingSenderId:"441147357738",appId:"1:441147357738:web:1b79de105155875813a153",measurementId:"G-8Z51HVX18T"},ZC=bp(JC),kn=QC(ZC),eE=({players:t,onClose:e})=>{const[n]=U.useState(()=>crypto.randomUUID()),[r,i]=U.useState(!1),[s,o]=U.useState(!1),l=async()=>{o(!0);try{const u=window.location.pathname.replace(/\/$/,"")||"",d=`🏆 *PELADA - CONFIRME SUA PRESENÇA!* 🏆
 
 👇 *Clique aqui para confirmar:*
-${`${window.location.origin}${f}/?event=${n}`}
+${`${window.location.origin}${u}/?event=${n}`}
 
 ⚽ Vai abrir uma página com seu nome
-⚡ É só clicar!`;window.open(`https://wa.me/?text=${encodeURIComponent(c)}`,"_blank"),i(!0)}catch(u){console.error("Erro ao salvar no Firebase:",u),alert("❌ Erro ao gerar link. Tente novamente.")}finally{o(!1)}},a=async()=>{o(!0);try{const u=xn(kn,`events/${n}`);await lo(u,{players:t.map(_=>({id:_.id,name:_.name,role:_.role})),createdAt:new Date().toISOString()});const f=window.location.pathname.replace(/\/$/,"")||"",c=`🏆 PELADA - CONFIRME SUA PRESENÇA! 🏆
+⚡ É só clicar!`,c=`https://wa.me/?text=${encodeURIComponent(d)}`;window.open(c,"_blank");const _=xn(kn,`events/${n}`);await lo(_,{players:t.map(y=>({id:y.id,name:y.name,role:y.role})),createdAt:new Date().toISOString()}),i(!0)}catch(u){console.error("Erro ao gerar link:",u),alert(`❌ Erro: ${u.message}`)}finally{o(!1)}},a=async()=>{o(!0);try{const u=xn(kn,`events/${n}`);await lo(u,{players:t.map(_=>({id:_.id,name:_.name,role:_.role})),createdAt:new Date().toISOString()});const f=window.location.pathname.replace(/\/$/,"")||"",c=`🏆 PELADA - CONFIRME SUA PRESENÇA! 🏆
 
 👇 Clique aqui para confirmar:
 ${`${window.location.origin}${f}/?event=${n}`}
