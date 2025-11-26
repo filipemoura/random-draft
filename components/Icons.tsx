@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Hand, Baby, Trash2, Shuffle, CheckCircle, XCircle } from 'lucide-react';
+import { Star, Hand, Baby, Trash2, Shuffle, CheckCircle, XCircle, Edit } from 'lucide-react';
 
 export const CaptainIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
   <Star className={className} fill="currentColor" />
@@ -27,4 +27,8 @@ export const CheckCircleIcon: React.FC<{ className?: string }> = ({ className = 
 
 export const XCircleIcon: React.FC<{ className?: string }> = ({ className = 'w-6 h-6' }) => (
   <XCircle className={className} />
+);
+
+export const EditIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
+  <Edit className={className} />
 );

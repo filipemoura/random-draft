@@ -39,7 +39,7 @@ const App: React.FC = () => {
     if (urlParams.has('new')) return <NewPlayerPage />;
     if (urlParams.has('event')) return <SelectPlayerPage />;
 
-    // Handlers de jogadores
+    // Handler adicionar jogador
     const handleAddPlayer = (name: string, role: Role) => {
         const newPlayer: Player = {
             id: crypto.randomUUID(),
@@ -51,16 +51,28 @@ const App: React.FC = () => {
         setError(null);
     };
 
+    // Handler remover jogador
     const handleRemovePlayer = (id: string) => {
         setPlayers(prev => prev.filter(p => p.id !== id));
     };
 
+    // Handler editar jogador (NOVO)
+    const handleEditPlayer = (id: string, name: string, role: Role) => {
+        setPlayers(prev => 
+            prev.map(p => 
+                p.id === id ? { ...p, name, role } : p
+            )
+        );
+    };
+
+    // Handler toggle presença
     const handleTogglePresence = (id: string) => {
-        setPlayers(prev =>
+        setPlayers(prev => 
             prev.map(p => p.id === id ? { ...p, present: !p.present } : p)
         );
     };
 
+    // Handler limpar todos
     const handleClearAll = () => {
         if (window.confirm('⚠️ Tem certeza que deseja remover todos os jogadores? Esta ação não pode ser desfeita.')) {
             setPlayers([]);
@@ -69,7 +81,7 @@ const App: React.FC = () => {
         }
     };
 
-    // Handler de times
+    // Handler sortear times
     const handleSortTeams = () => {
         setError(null);
         setTeams(null);
@@ -89,7 +101,7 @@ const App: React.FC = () => {
         }
     };
 
-    // Handler de sincronização
+    // Handler sincronizar
     const handleSync = () => {
         if (activeEventId) {
             syncEvent(activeEventId, players, setPlayers);
@@ -128,10 +140,11 @@ const App: React.FC = () => {
                                 Gerenciar Jogadores
                             </h2>
                             <PlayerForm onAddPlayer={handleAddPlayer} />
-                            <PlayerList
-                                players={players}
+                            <PlayerList 
+                                players={players} 
                                 onRemovePlayer={handleRemovePlayer}
                                 onTogglePresence={handleTogglePresence}
+                                onEditPlayer={handleEditPlayer}
                             />
                         </div>
 
